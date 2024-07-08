@@ -1,0 +1,140 @@
+clear all; clc;
+close all;
+fiy=1;
+%Initialisation
+th_int=[0 0 0];
+x0=zeros(12,1);%initial positions
+ths=[0.75 0.8 0.2];%set points
+
+Ts=[0 10];%time-span
+
+%Robot specifications
+M1=15.91; M2=11.36; M3=3;
+L1=0.432;L2=L1;L3=0.5;
+spec=[L1 L2 L3 M1 M2 M3];
+%PID Parameters
+%PID Parameters for Kpid1
+%Kp1=500
+Kp1=1000;
+Kd1=100;
+Ki1=100;
+%Parameters for Kpid2
+%Kp2=500
+Kp2=1000;
+Kd2=100;
+Ki2=100;
+%Parameters for Kpid3
+%Kp3=5000
+Kp3=5000;
+Kd3=1000;
+Ki3=10000;
+
+%Kpid=[Kp1 Kp2 Kp3];
+Kpid=[Kp1 Kd1 Ki1 Kp2 Kd2 Ki2 Kp3 Kd3 Ki3];
+
+%ODE solving 
+%opt1=odeset('RelTol', 1e-10, 'Abstrol', 1e-20, 'NormControl', 'off');
+[T,X]= ode45(@(t,x) r3dof(t,x,ths,spec,Kpid), Ts, x0);
+
+%Output 
+th1=X(:,4); %theta1 waveform
+th2=X(:,5); %theta2 waveform
+d3=X(:,6);%d3 waveform
+
+%torque inputs computation from the 7th, 8th states inside ODE
+F1=diff(X(:,10))./diff(T);
+F2=diff(X(:,11))./diff(T);
+F3=diff(X(:,12))./diff(T);
+tt=0:(T(end)/(length(F1)-1)):T(end);
+
+%xyz
+x1=L1*cos(th1);
+y1=L1*sin(th1);
+z1=0;
+x2=L1*cos(th1)+L2*cos(th1+th2);
+y2=L1*sin(th1)+L2*sin(th1+th2);
+z2=0;
+x3=x2;
+y3=y2;
+z3=L3-d3;
+
+th1s=taf(T,5,ths(1));
+th2s=taf(T,5,ths(2));
+th3s=taf(T,5,ths(3));
+
+%theta-1 plot
+figure(fiy); fiy=fiy+1;
+plot(T, th1,'linewidth',2);
+grid on;
+title("Theta-1");
+ylabel('theta(rad)');
+xlabel('T(sec)');
+
+%theta-1 error plot
+figure(fiy); fiy=fiy+1;y1=th1s-th1;
+plot(T,y1 ,'linewidth',2);
+grid on;
+title("Theta-1 Error");
+ylabel('theta(rad)');
+xlabel('T(sec)');
+
+%theta-1 torque plot
+figure(fiy); fiy=fiy+1;
+plot(tt, F1);
+grid on;
+title("Theta-1 Torque");
+ylabel('theta-1 Torque(N.m)');
+xlabel('T(sec)');
+
+%Theta-2 plot
+figure(fiy); fiy=fiy+1;
+plot(T, th2,'linewidth',2);
+grid on;
+title("Theta-2");
+ylabel('theta(rad)');
+xlabel('T(sec)');
+
+%Theta-2 error plot
+figure(fiy); fiy=fiy+1;
+plot(T, th2s-th2,'linewidth',2);
+grid on;
+title("Theta-2 Error");
+ylabel('theta(rad)');
+xlabel('T(sec)');
+
+%Theta2-torque plot
+
+figure(fiy); fiy=fiy+1;
+plot(tt, F2,'linewidth',2);
+grid on;
+title("Theta-2 Torque");
+ylabel('theta Torque(N.m)');
+xlabel('T(sec)');
+axis([Ts -1 2]);
+%theta-3 plot
+figure(fiy); fiy=fiy+1;
+plot(T, d3,'linewidth',2);
+grid on;
+title("d3");
+ylabel('Distance(m)');
+xlabel('T(sec)');
+
+%theta-3 error plot
+figure(fiy); fiy=fiy+1;
+plot(T, th3s-d3,'linewidth',2);
+grid on;
+title("d3 Error");
+ylabel('theta(rad)');
+xlabel('T(sec)');
+
+%theta-3 torque plot
+figure(fiy); fiy=fiy+1;
+plot(tt, F3,'linewidth',2);
+grid on;
+title("d3 Torque");
+ylabel('d3 Torque(N.m)');
+xlabel('T(sec)');
+
+
+
+

@@ -58,9 +58,9 @@ x3=x2;
 y3=y2;
 z3=L3-d3;
 
-th1s=taf(T,5,ths(1));
-th2s=taf(T,5,ths(2));
-th3s=taf(T,5,ths(3));
+th1s=trajectory(T,5,ths(1));
+th2s=trajectory(T,5,ths(2));
+th3s=trajectory(T,5,ths(3));
 
 %theta-1 plot
 figure(fiy); fiy=fiy+1;

@@ -48,12 +48,15 @@ F3=diff(X(:,12))./diff(T);
 tt=0:(T(end)/(length(F1)-1)):T(end);
 
 %xyz
+x0=0;
+y0=0;
+z0=L3;
 x1=L1*cos(th1);
 y1=L1*sin(th1);
-z1=0;
+z1=L3;
 x2=L1*cos(th1)+L2*cos(th1+th2);
 y2=L1*sin(th1)+L2*sin(th1+th2);
-z2=0;
+z2=L3;
 x3=x2;
 y3=y2;
 z3=L3-d3;
